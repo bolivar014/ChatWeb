@@ -323,7 +323,8 @@
     php artisan make:event [FireEvent]
     php artisan make:event FireComment
 	
-[*] 
+[*] Instalando Vue-resources
+    npm i -S vue-resource
 	
 [*] 
 	
