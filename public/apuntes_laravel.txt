@@ -68,6 +68,10 @@
 	php artisan make:model [NombreModel]
 	php artisan make:model Message
 	
+    Genera un modelo con su respectiva migración
+    php artisan make:model Message  --migration
+	
+
 [*] Creación de Tokens en los formularios.
 	{{ csrf_field() }}
 	
