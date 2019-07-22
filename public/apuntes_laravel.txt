@@ -319,7 +319,9 @@
     composer require pusher/pusher-php-server
 
 	
-[*] 
+[*] Creacion de Eventos
+    php artisan make:event [FireEvent]
+    php artisan make:event FireComment
 	
 [*] 
 	
