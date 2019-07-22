@@ -1,0 +1,404 @@
+[*] Verificar Estado de git..
+    git status
+
+    Inicializar repositorio git
+    git init 
+
+    agregar todo el repositorio al git...
+    git add -A 
+
+    Nombre del primer commit
+    git commit -m "Actualización de rutas CategoriasController"
+
+    git remote add origin [https://github.com/bolivar014/AppShop.git]
+ 	git remote add origin https://github.com/bolivar014/CursoVueJS_Laravel
+	 
+    git push -f origin master
+
+[*] Descargar el repositorio inicial de laravel.
+	composer create-project --prefer-dist laravel/laravel [nombre_App]
+	composer create-project --prefer-dist laravel/laravel AppShop
+
+
+[*] Creación de los controladores de Rutas. 
+	php artisan make:controller [NombreController]
+	php artisan make:controller PagesController
+
+[*] Creación de Layouts.
+	1) Creamos una carpeta con el nombre de "layouts"
+	2) Creamos un archivo con el nombre "app.blade.php"
+	3) Implementamos en la MasterPage "app.blade.php" y asignamos la sección Contenido con @yield('content')
+	4) En la sección donde exportaremos a las vistas, asignamos
+		@extends('layouts.app')
+			@section('content')
+				datos que cargaran en la MasterPage
+			@endsection
+
+
+[*]	Creación de Migrations
+		Crear una nueva migracion.	
+		php artisan make:migration [nombre_migration_table] --create messages
+		php artisan make:migration create-messages_table --create messages
+
+		Ejecutar migraciones pendientes.
+		php artisan migrate
+	
+		Editar una migración existente
+		php artisan make:migration nombre_migracion_ --table [nombreTable]
+		php artisan make:migration add_created_at_index_to_messages_table --table messages
+		php artisan make:migratrion create_articulos_table
+		-- 
+		Para este caso en el esquema de esta migración en el metodo UP
+		 	$table->index('created_at');
+		en el metodo DOWN 
+        	$table->dropIndex('messages_created_at_index');
+
+        Restablecer hasta la ultima migración
+        php artisan migrate:rollback
+
+        Resetear todas las migraciones
+        php artisan migrate:reset
+
+        Restaurar todas las migracciones
+        php artisan migrate:refresh
+
+[*] Crear un modelo
+	Nombre de la clase Message buscara la tabla messages en la db, por lo cual debemos tener en cuenta la sintaxis
+	en caso de ser varias palabras, el nombre del modelo seria MessageContent y el nombre de la tabla message_contents
+	php artisan make:model [NombreModel]
+	php artisan make:model Message
+	
+[*] Creación de Tokens en los formularios.
+	{{ csrf_field() }}
+	
+[*] Para recibir parametros desde los formularios, se implementa un objeto (Request $request)
+
+	
+[*] 
+	php artisan make:request [CreateNombreRequest]
+	php artisan make:request CreateMessageReques
+	
+[*] Error Add [content] to fillable property to allow mass assignment on [App\Message]...
+	vamos al modelo donde nos genera el error y agregamos...
+	 protected $guarded = []; // en este caso es vacio porque no necesitamos parametrizar variables ya que no manejamos contraseñas
+	
+[*] Creación de Seeds con Tinker
+		- Verificar que este Activo Tinker en ../composer.json
+			"require" : { "laravel/tinker": "^1.0" } 
+		- En ../config/app.php verificamos que este activo el servicio [TINKER PROVIDERS]
+			/*
+			* Package Service Providers...
+		 	*/
+		    Laravel\Tinker\TinkerServiceProvider::class,
+	        
+		- Adicional Agregamos función en la ruta ../database/factories/[nombreFactory] una función que cree los datos.
+			// Para este caso se utiliza esta función para crear mensajes que contenga 'content' y 'image'
+			$factory->define(App\Message::class, function(Faker $faker){
+		    return [
+			    'content' => $faker->realText(random_int(20, 160)), // Se le asigna una longitud en el texto de 20 a 160 caracteres.
+		        'image' => $faker->imageUrl(600,338)
+		    	];
+			});
+
+		- Activamos el servicio con:
+		php artisan tinker
+			[*] creación de un registro en la base de datos,
+			$message = factory(App\Message::class)->create()
+
+		Para la creación de Registros automaticos, hacemos el siguiente proceso.
+		En la carpeta ../database/seeds/DatabaseSeeder.php, utilizamos la función public function run(), para generar mensajes automaticos con la siguiente linea...
+		factory(App\Message::class)
+		->times(100) // Generamos 100 mensajes y los creamos
+		->create();
+
+		adicional Ejecutamos 
+		php artisan db:seed
+
+[*] Ejecutar RollBack de Todas las MIGRATION existentes y ejecutar los Seeds Creados para generar sus datos...
+	php artisan migrate:refresh --seed 
+	
+[*] metodo paginate() de eloquent
+	Agregamos en el controlador donde deseamos dar una paginación, la funcion ::paginate(Longitud);
+	Ejm: Paginación View Welcome
+	
+	public function home()
+    {
+        $messages = Message::paginate(30); // Paginación(Cantidad Datos A Mostrar)
+        
+        // dd($messages); // desbordamiento del código para verificar datos enviados
+
+        return view('welcome',[
+            'messages' => $messages,
+            ]);
+    }
+	
+	Adicional En la View Agregamos...
+	@if(count($messages))
+		<div class="mt-2 mx-auto">
+			{{ $messages->links('pagination::bootstrap-4') }}
+		</div>
+	@endif
+
+[*] Agregar Autenticación en laravel...
+	php artisan make:auth
+	
+[*] Ejecutar los seeds creados.
+	php artisan db:seed
+	
+[*] Errores de longitud de caracteres...
+	se agrega lo siguiente en la ruta... App/Providers/AppServiceProvider
+	use Illuminate\Support\Facades\Schema;
+   	public function boot()
+    {
+        //
+        Schema::defaultStringLength(191);
+    }
+	
+[*] Representacion de modelos y migraciones...
+	User -> users
+	Product -> products
+	Gallery -> galleries
+	
+[*] 
+	php artisan make:model [NombreModelo] -m
+	php artisan make:model Category -m
+	
+[*] despues de asignar las relaciones entre las tablas, en el modelo debemos asignar su relación
+	
+[*] Creacion de Seeders
+	php artisan make:seeder [NombreModelTableSeeder]
+	php artisan make:seeder UsersTableSeeder	
+
+[*] Creacion de los Factories...
+	php artisan make:factory [NameFactory]
+	php artisan make:factory ProductFactory
+	
+[*] Tipos de Peticiones
+	Get: cuando deseamos consultar información.
+	Post: Cuando deseamos Actualizar información
+	
+[*] Crear Middleware
+	php artisan make:middleware [NombreMiddleware]
+	php artisan make:middleware AdminMiddleware
+	 	
+		cada vez que deseemos utilizar un middleware en grupo de rutas, debemos agregar su alias en...
+		App\Http\Kernel
+		en.. 
+		protected $routeMiddleware = [
+			'admin' => \App\Http\Middleware\AdminMiddleware::class,
+    	];
+
+		adicional el control de las rutas para este admin seria...
+		->prefix('admin') // Es para controlar las rutas de admin...
+		Route::middleware(['auth','admin'])->prefix('admin')->group(function(){
+		{
+		    // Rutas para usuario con roll administrador...
+		});
+
+	
+[*] Para Cargar archivos al servidor sin importar el formato... Agregamos al form un metodo enctype="multipart/form-data"	
+	<form action="" method="post" enctype="multipart/form-data">
+		{{ csrf_field() }}
+		<input type="file" name="photo" required>
+		<button type="submit" class="brn btn-primary btn-round">Subir Imagen</button>
+	
+		<a href="{{ url('/admin/products') }}" class="btn btn-primary btn-round">Volver Atras...</a>
+	</form>
+
+[*] Guardar Y Eliminar archivos al servidor...
+		Exportamos "Use File;", en el modelo donde vayamos a utilizar este servicio.. 
+	    // Guardar Archivos
+		public function store(Request $request, $id)
+		{
+			// Recuperamos el archivo que se esta cargando
+			$file = $request->file('photo'); // nombre del input donde buscara el archivo
+			$path = public_path() . '/images/products'; // Asignamos la ruta donde almacenara el archivo
+			$fileName = uniqid() . $file->getClientOriginalName(); // Convertimo el nombre del archivo
+			$moved = $file->move($path, $fileName); // Guardamos el archivo en la ruta deseada...
+
+			if($moved) // True or False, si se ha guardado el archivo correctamente...
+			{
+				// Crea el registro de la nueva imagen
+				$productImage = new ProductImage();
+				$productImage->image = $fileName;
+				$productImage->featured = false;
+				$productImage->product_id = $id;
+				$productImage->save(); // Guardamos Registro En La DB.
+			}            
+				return back();
+		}
+	
+		// Eliminar Archivos
+	    public function destroy(Request $request, $id)
+		{
+			$productImage = ProductImage::find($request->input('image_id'));
+			if(substr($productImage->image,0 ,4) !== "http")
+			{
+				$deleted = true;
+			}
+			else
+			{
+				$fullPath = public_path() . '/images/products/' . $productImage->image;
+				$deleted = File::delete($fullPath);
+			}
+
+			if($deleted)
+			{
+				$productImage->delete();
+			}
+			return back();
+		}
+
+[*] Al cambiar los Controladores de rutas, debemos actualizar los controladores de la siguiente manera.
+	namespace App\Http\Controllers\Admin;
+	use App\Http\Controllers\Controller;
+	
+[*] Agregar codigo Css y Js en sintaxis mimificada..
+    
+    mix.js('resources/js/app.js', 'public/js')
+    .sass('resources/sass/app.scss', 'public/css');
+	
+[*] Laravel Mix para compilar Archivos CSS y JS
+    se crea la siguiente ruta /resources/plantilla/
+    adicional se crean dos carpetas 
+        css
+        js  
+        se agrega las dependencias css y js en su respectiva carpeta adicional en la ruta
+        /webpack.mix.js, se agrega el siguiente vector de estilos y js
+        mix.styles([
+            'resources/plantilla/css/font-awesome.min.css',
+            'resources/plantilla/css/simple-line-icons.min.css',
+            'resources/plantilla/css/style.css'
+        ], 'public/css/plantilla.css');
+
+        mix.scripts([
+            'resources/plantilla/js/bootstrap.min.js',
+            'resources/plantilla/js/Chart.min.js',
+            'resources/plantilla/js/jquery.min.js',
+            'resources/plantilla/js/pace.min.js',
+            'resources/plantilla/js/popper.min.js',
+            'resources/plantilla/js/template.js'
+        ], 'public/js/plantillan.js');
+
+        mix.js(['resources/js/app.js'
+        ],'public/js/app.js');
+
+[*] Es requerido npm y NodeJS
+    Vericar versiones
+    npm -v
+    node -
+
+    instalación de repositorios dependientes...
+    npm install
+
+    ejecución de todas las dependencias 
+    npm run dev
+
+    por ultimo se asigna en la MasterPage, que busque los links generados...
+
+    // En el Head...
+    <link href="css/plantilla.css" rel="stylesheet">
+
+    // Antes del Body
+    <script src="js/plantilla.js"></script>
+
+[*] Verificar Lista de rutas...
+	php artisan route:list
+	
+[*] Asignar zona horaria del pais
+	$mytime = Carbon::now('America/Bogota'); 
+	adicional se agrega  en la cabecera...
+		use Carbon\Carbon;
+
+[*] Instalar dependencias Pusher
+    npm i -S laravel-echo pusher-js
+    composer require pusher/pusher-php-server
+
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
+	
+[*] 
