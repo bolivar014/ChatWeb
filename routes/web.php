@@ -29,14 +29,14 @@ Route::group(['prefix' => 'pusher', 'middleware' => ['auth']], function(){
             $comment->save();
             // Emite el siguiente evento a Excepción de a Nosotros mismos...
             broadcast(new \App\Events\FireComment($comment))->toOthers();
-    });
+    })->name('comments.create');
 
 
     // Retorna Vista Chat Con Comentarios
     Route::get('posts/{id}', function($id){
         $post = \App\Post::findOrFail($id);
         return view('chat', compact('post'));
-    });
+    })->name('comments.list');
 
     // Ruta que Retorna un Json Con Comentarios de Acuerdo al POST_ID 
     Route::get('comments/{id}', function($id){
