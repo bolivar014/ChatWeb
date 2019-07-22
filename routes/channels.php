@@ -14,3 +14,10 @@
 Broadcast::channel('App.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
+
+// Ruta para los comentarios
+Broadcast::channel('comments.{post_id}', function ($user, $post_id) {
+    return (int) $user->id === (int) auth()->user()->id;
+    // return true;
+});
+
